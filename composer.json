@@ -1,0 +1,16 @@
+{
+  "name": "katmandu292/Byblios202",
+  "description": "Book Management application",
+  "authors": [
+    {
+      "name": "Catman Thunderbolt",
+      "email": "catalind@dcatalin.ro"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Framework\\": "Framework/",
+      "App\\": "App/"
+    }
+  }
+}

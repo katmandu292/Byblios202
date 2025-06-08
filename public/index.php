@@ -3,10 +3,19 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require __DIR__ . '/../vendor/autoload.php';
+
 require 'helpers.php';
 
-require basePath('Framework/Router.php');
-require basePath('Framework/Database.php');
+use Framework\Router;
+
+//spl_autoload_register(function ($class) {
+//   $path = basePath('Framework/' . $class . '/.php');
+//
+//   if (file_exists($path)) {
+//     require $path;
+//   }
+//});
 
 $router = new Router();
 
