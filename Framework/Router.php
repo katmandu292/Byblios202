@@ -24,6 +24,7 @@ class Router {
        'controller' => $controller,
        'controllerMethod' => $controllerMethod
      ];
+
    }
 
    /**
@@ -84,6 +85,9 @@ class Router {
    public function route($uri, $method)
    {
      foreach($this->routes as $route) {
+
+       inspect(strpos($uri,$route['uri']));
+
        if($route['uri'] === $uri && $route['method'] === $method) {
 //       Extract Controller and Controller Method
          $controller = 'App\\controllers\\' . $route['controller'];
@@ -92,13 +96,44 @@ class Router {
          $controllerInstance = new $controller();
          $controllerInstance->$controllerMethod();
          return;
+       } else {
+         if(strpos($uri,$route['uri']) === false && $route['method'] === $method) {
+            $volumeId = $this->getId($this->getRest($_SERVER['REQUEST_URI']));
+            $controller = 'App\\controllers\\' . $route['controller'];
+            $controllerMethod = $route['controllerMethod'];
+            $controllerInstance = new $controller();
+            if($controllerMethod === 'show') {
+               echo "Going to apply " . $route['controller'] . "->" . $controllerMethod;
+               $controllerInstance->$controllerMethod($volumeId);
+               return;
+            }
+         }
        }
-
      }
 
      http_response_code(404);
      loadView('error/404');
      exit;
+   }
+
+   /**
+    *
+    * @param string $suffix
+    * @return string
+    */
+   private function getId($suffix)
+   {
+     return substr($suffix,(1+strpos($suffix,'=')));
+   }
+
+   /**
+    *
+    * @param string $request
+    * @return string
+    */
+   private function getRest($request)
+   {
+     return substr($request,(1+strpos($request,'?')));
    }
 }
 

@@ -50,6 +50,7 @@ join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID)')->fetchAll();
    */
   public function show($params)
   {
+    inspectAndDie($_GET);
     $id = $params['id'] ?? '';
 
     $params = [
@@ -65,7 +66,7 @@ join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID)')->fetchAll();
     }
 
     loadView('books/show', [
-      'listing' => $listing
+      'book' => $book
     ]);
   }
 
