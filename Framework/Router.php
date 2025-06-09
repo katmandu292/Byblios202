@@ -75,6 +75,7 @@ class Router {
      $this->registerRoute('PUT', $uri, $controller);
    }
 
+
    /**
     * Route the request
     *
@@ -86,55 +87,44 @@ class Router {
    {
      foreach($this->routes as $route) {
 
-       inspect(strpos($uri,$route['uri']));
+//    Split the current URI into segments
+       $uriSegments = explode('/', trim($uri, '/'));
+//    Split the route URI into segments
+       $routeSegments = explode('/', trim($route['uri'], '/'));
+       $match = true;
 
-       if($route['uri'] === $uri && $route['method'] === $method) {
-//       Extract Controller and Controller Method
-         $controller = 'App\\controllers\\' . $route['controller'];
-         $controllerMethod = $route['controllerMethod'];
-//       Instantiate the Controller and call the method
-         $controllerInstance = new $controller();
-         $controllerInstance->$controllerMethod();
-         return;
-       } else {
-         if(strpos($uri,$route['uri']) === false && $route['method'] === $method) {
-            $volumeId = $this->getId($this->getRest($_SERVER['REQUEST_URI']));
-            $controller = 'App\\controllers\\' . $route['controller'];
-            $controllerMethod = $route['controllerMethod'];
-            $controllerInstance = new $controller();
-            if($controllerMethod === 'show') {
-               echo "Going to apply " . $route['controller'] . "->" . $controllerMethod;
-               $controllerInstance->$controllerMethod($volumeId);
-               return;
-            }
-         }
+       $params = [];
+       $match = true;
+
+       for ($i = 0; $i < count($uriSegments); $i++) {
+          if (isset($routeSegments[$i])) {
+             if ($routeSegments[$i] !== $uriSegments[$i] && !preg_match('/\{(.+?)\}/', $routeSegments[$i])) {
+                $match = false;
+                break;
+             }
+          } else {
+             $match = false;
+             break;
+          }
+       }
+
+       if($match && $route['method'] === $method) {
+          parse_str($_SERVER['QUERY_STRING'],$params);
+//  Extract Controller and Controller Method
+          $controller = 'App\\controllers\\' . $route['controller'];
+          $controllerMethod = $route['controllerMethod'];
+//  Instantiate the Controller and call the method
+          $controllerInstance = new $controller();
+          $controllerInstance->$controllerMethod($params);
+          return;
        }
      }
 
-     http_response_code(404);
-     loadView('error/404');
-     exit;
+   http_response_code(404);
+   loadView('error/404');
+   exit;
    }
 
-   /**
-    *
-    * @param string $suffix
-    * @return string
-    */
-   private function getId($suffix)
-   {
-     return substr($suffix,(1+strpos($suffix,'=')));
-   }
-
-   /**
-    *
-    * @param string $request
-    * @return string
-    */
-   private function getRest($request)
-   {
-     return substr($request,(1+strpos($request,'?')));
-   }
 }
 
 ?>
