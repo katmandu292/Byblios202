@@ -6,9 +6,9 @@
   <div class="rounded-lg shadow-md bg-white p-3">
 <!--    loadPartial('message') -->
     <div class="flex justify-between items-center">
-      <a class="block p-4 text-blue-700" href="books">
+      <a class="block p-4 text-blue-700" href="/">
         <i class="fa fa-arrow-alt-circle-left"></i>
-        Back To Listings
+        Back To Book List
       </a>
 <!--    php if (Framework\Authorization::isOwner($listing->user_id)) :-->
         <div class="flex space-x-4 ml-4">
