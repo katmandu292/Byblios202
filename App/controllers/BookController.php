@@ -39,7 +39,20 @@ join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID)')->fetchAll();
    */
   public function create()
   {
-    loadView('books/create');
+    $authors = $this->db->query('select aut.PERS_ID, aut.AUTH_NAME from tbl_authors aut')->fetchAll();
+
+    $publishers = $this->db->query('select ed.EDITOR_ID, ed.EDITOR_NAME from tbl_editors ed')->fetchAll();
+
+    $bookCollections = $this->db->query('select cl.collection_id, cl.collection_name from tbl_collections cl')->fetchAll();
+
+    $genres = $this->db->query('select gr.GENRE_ID, gr.GENRE_LABEL from tbl_genres gr')->fetchAll();
+
+    loadView('books/create', [
+      'authors' => $authors,
+      'editors' => $publishers,
+      'collections' => $bookCollections,
+      'genres' => $genres
+    ]);
   }
 
   /**
@@ -73,5 +86,15 @@ where bk.VOLUME_ID = :id', $params)->fetch();
     ]);
   }
 
+  /**
+   * Store data in database
+   * 
+   * @return void
+   */
+  public function store()
+  {
+//    inspectAndDie($_POST);
+      inspectAndDie($authors);
+  }
 }
 
