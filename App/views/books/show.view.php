@@ -28,14 +28,14 @@
         <?= $book->VOL_INFO ?>
       </p>
       <ul class="my-4 bg-gray-100 p-4">
-        <li class="mb-2"><strong>Salary:</strong> Price</li>
+        <li class="mb-2"><strong>Genre:</strong> <?= $book->GENRE_LABEL ?></li>
         <li class="mb-2">
-          <strong>Location:</strong> Whatever
+          <strong>Author:</strong> <?= $book->AUTH_NAME ?>
           <!-- <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span> -->
         </li>
 <!--      php if (!empty($listing->tags))  -->
           <li class="mb-2">
-            <strong>Editor ID:</strong> <?= $book->LAUNCHED_BY ?>
+            <strong>Published By:</strong> <?= $book->EDITOR_NAME ?>
           </li>
 <!--      php endif -->
       </ul>
@@ -65,3 +65,4 @@
 
 <?= loadPartial('bottom-banner') ?>
 <?= loadPartial('footer') ?>
+

@@ -19,41 +19,59 @@
             Book Info
           </h2>
 
+<?php if(isset($errors)) : ?>
+   <?php foreach ($errors as $error) : ?>
+          <div class="message bg-red-100 my-3"><?= $error ?></div>
+   <?php endforeach; ?>
+<?php endif; ?>
           <div class="mb-4">
             <input
               type="text"
-              name="title"
+              name="VOL_TITLE"
               placeholder="Book Title"
+              value="<?= $bookData['VOL_TITLE'] ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
           </div>
           <div class="mb-4">
             <textarea
-              name="description"
+              name="VOL_INFO"
               placeholder="Book Description"
               class="w-full px-4 py-2 border rounded focus:outline-none"
-            ></textarea>
+            ><?= $bookData['VOL_INFO'] ?? '' ?></textarea>
           </div>
           <div class="mb-4">
             <input
               type="text"
-              name="year"
+              name="LAUNCH_YEAR"
               placeholder="Release Year"
+              value="<?= $bookData['LAUNCH_YEAR'] ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
           </div>
           <div class="mb-4">
             <input
               type="text"
-              name="isbn"
+              name="ISBN"
               placeholder="ISBN"
+              value="<?= $bookData['ISBN'] ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
+          </div>
+          <div class="mb-4">
+            <select
+              name="AUTHOR_ID"
+              class="w-full px-4 py-2 border rounded focus:outline-none"
+            >
+<?php foreach($authors as $author) : ?>
+                  <option value="<?= $author->PERS_ID ?>"><?= $author->AUTH_NAME ?></option>
+<?php endforeach; ?>
+            </select>
           </div>
           <div class="mb-4">
 <!-- the novel type -->
             <select
-              name="genre"
+              name="GENRE_ID"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             >
                <?php foreach($genres as $genre) : ?>
@@ -71,36 +89,23 @@
           <div class="mb-4">
 <!-- the Publishing Company -->
             <select
-              name="company"
+              name="LAUNCHED_BY"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             >
-               <?php foreach($editors as $editor) : ?>
-                   <option value="<?= $editor->EDITOR_ID ?>">
-                   <?= $editor->EDITOR_NAME ?></option>
-               <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="mb-4">
-            <select
-              name="author"
-              class="w-full px-4 py-2 border rounded focus:outline-none"
-            >
-                <?php foreach($authors as $author) : ?>
-                  <option value="<?= $author->PERS_ID ?>">
-                  <?= $author->AUTH_NAME ?></option>
-                <?php endforeach; ?>
+<?php foreach($editors as $editor) : ?>
+                   <option value="<?= $editor->EDITOR_ID ?>"><?= $editor->EDITOR_NAME ?></option>
+<?php endforeach; ?>
             </select>
           </div>
 
           <div class="mb-4">
             <select
-              name="collection"
+              name="COLLECT_ID"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             >
-            <?php foreach($collections as $collection) : ?>
-                <option value="<?= $collection->collection_id ?>">
-                <?= $collection->collection_name ?></option>
-            <?php endforeach; ?>
+<?php foreach($collections as $collection) : ?>
+                <option value="<?= $collection->collection_id ?>"><?= $collection->collection_name ?></option>
+<?php endforeach; ?>
             </select>
           </div>
           <button
@@ -122,3 +127,4 @@
 
 <?= loadPartial('footer') ?>
 
+?>

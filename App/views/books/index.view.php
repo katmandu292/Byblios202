@@ -22,17 +22,17 @@
                 <?= substr($book->VOL_INFO,1,132) ?>
               </p>
               <ul class="my-4 bg-gray-100 p-4 rounded">
-                <li class="mb-2"><strong>Salary:</strong> $80,000</li>
+                <li class="mb-2"><strong>Published By:</strong> <?= $book->EDITOR_NAME ?></li>
                 <li class="mb-2">
-                  <strong>Location:</strong> New York
+                  <strong>Written By:</strong> <?= $book->AUTH_NAME ?>
                   <span
                     class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2"
-                    ><?= $book->GENRE_LABEL ?></span
+                    ><?= $book->LAUNCH_YEAR ?></span
                   >
                 </li>
                 <li class="mb-2">
-                  <strong>Tags:</strong> <span>Development</span>,
-                  <span>Coding</span>
+                  <strong>Genre:</strong> <span><?= $book->GENRE_LABEL ?></span>
+<!--             ,<span>Coding</span  -->
                 </li>
               </ul>
               <a href="book/<?= $book->VOLUME_ID ?>"
