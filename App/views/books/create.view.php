@@ -127,4 +127,3 @@
 
 <?= loadPartial('footer') ?>
 
-?>
