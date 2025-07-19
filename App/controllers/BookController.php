@@ -141,7 +141,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
           ]);
       } else {
 //       inspectAndDie($newBookData);
-         $fields = [];
+          $fields = [];
           $values = [];
 
           foreach ($newBookData as $field => $value) {
@@ -158,7 +158,6 @@ where bk.VOLUME_ID = :id', $params)->fetch();
           }
 
           $values = implode(', ', $values);
-
           $insert = "insert into `tbl_books` ({$fields}) values ({$values})";
 
           $this->db->query($insert, $newBookData);
@@ -173,6 +172,35 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
   }
 
+  /**
+   * Delete a book
+   *
+   * @param array $params
+   * @return void
+   */
+  public function destroy($params) {
+
+    $id = $params['id'] ?? '';
+
+    $params = [
+      'id' => $id
+    ];
+
+    $book = $this->db->query('select bk.VOLUME_ID, bk.VOL_TITLE,
+bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch(); 
+
+    // Check if book exists
+    if (!$book) {
+      ErrorController::notFound('Book not found');
+      return;
+    }
+
+    $this->db->query('delete from tbl_books where VOLUME_ID = :id',$params);
+
+    $_SESSION['success_message'] = 'Successfully deleted the Book';
+
+    redirect('/byblios');
+  }
 }
 
 ?>

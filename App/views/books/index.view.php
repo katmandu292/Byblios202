@@ -8,10 +8,10 @@
     <section>
       <div class="container mx-auto p-4 mt-4">
         <div class="text-center text-3xl mb-4 font-bold border border-gray-300 p-3">
-           Recent Books
+           All Books
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
   <?php foreach($books as $book) : ?>
 
           <!-- Job Listing <?= $book->VOLUME_ID ?> -->
@@ -19,7 +19,7 @@
             <div class="p-4">
               <h2 class="text-xl font-semibold"><?= $book->VOL_TITLE ?></h2>
               <p class="text-gray-700 text-lg mt-2">
-                <?= substr($book->VOL_INFO,1,132) ?>
+                <?= substr($book->VOL_INFO,0,132) ?>
               </p>
               <ul class="my-4 bg-gray-100 p-4 rounded">
                 <li class="mb-2"><strong>Published By:</strong> <?= $book->EDITOR_NAME ?></li>
