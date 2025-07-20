@@ -7,28 +7,23 @@
 <!-- Post a Book Form Box -->
     <section class="flex justify-center items-center mt-20">
       <div class="bg-white p-8 rounded-lg shadow-md w-full md:w-600 mx-6">
-        <h2 class="text-4xl text-center font-bold mb-4">Create a Book Presentation</h2>
+        <h2 class="text-4xl text-center font-bold mb-4">Edit a Book Presentation</h2>
 
 <?= loadPartial('flash') ?>
 
-        <form method="POST" action="../books">
-
+        <form method="POST" action="/byblios/book/show/<?= $bookData->VOLUME_ID ?>">
+          <input type="hidden" name="_method" value="PUT">
           <br />
           <h2 class="text-2xl font-bold mb-6 text-center text-gray-500">
             Book Info
           </h2>
 
-<?php if(isset($errors)) : ?>
-   <?php foreach ($errors as $error) : ?>
-          <div class="message bg-red-100 my-3"><?= $error ?></div>
-   <?php endforeach; ?>
-<?php endif; ?>
           <div class="mb-4">
             <input
               type="text"
               name="VOL_TITLE"
               placeholder="Book Title"
-              value="<?= $bookData['VOL_TITLE'] ?? '' ?>"
+              value="<?= $bookData->VOL_TITLE ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
           </div>
@@ -37,14 +32,14 @@
               name="VOL_INFO"
               placeholder="Book Description"
               class="w-full px-4 py-2 border rounded focus:outline-none"
-            ><?= $bookData['VOL_INFO'] ?? '' ?></textarea>
+            ><?= $bookData->VOL_INFO ?? '' ?></textarea>
           </div>
           <div class="mb-4">
             <input
               type="text"
               name="LAUNCH_YEAR"
               placeholder="Release Year"
-              value="<?= $bookData['LAUNCH_YEAR'] ?? '' ?>"
+              value="<?= $bookData->LAUNCH_YEAR ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
           </div>
@@ -53,7 +48,7 @@
               type="text"
               name="ISBN"
               placeholder="ISBN"
-              value="<?= $bookData['ISBN'] ?? '' ?>"
+              value="<?= $bookData->ISBN ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
             />
           </div>
@@ -113,7 +108,7 @@
             Save
           </button>
           <a
-            href="/"
+            href="/byblios/book/edit/<?= $bookData->VOLUME_ID ?>"
             class="block text-center w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded focus:outline-none"
           >
             Cancel

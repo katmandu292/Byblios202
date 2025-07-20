@@ -187,7 +187,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
     ];
 
     $book = $this->db->query('select bk.VOLUME_ID, bk.VOL_TITLE,
-bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch(); 
+bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
 
     // Check if book exists
     if (!$book) {
@@ -201,6 +201,64 @@ bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
 
     redirect('/byblios');
   }
+
+  /**
+   * Render a book edit form
+   *
+   * @param array $params
+   * @return void
+   */
+  public function edit($params)
+  {
+    $this->getAttribs();
+
+    $id = $params['id'] ?? '';
+
+    $params = [
+      'id' => $id
+    ];
+
+    $book = $this->db->query('select bk.VOLUME_ID, bk.AUTHOR_ID, au.AUTH_NAME, bk.GENRE_ID,
+bk.COLLECT_ID, gr.GENRE_LABEL, bk.LAUNCHED_BY, bk.ISBN, bk.VOL_TITLE, bk.VOL_INFO,
+ed.EDITOR_NAME,
+bk.LAUNCH_YEAR from tbl_books bk join tbl_authors au on (bk.AUTHOR_ID = au.PERS_ID)
+join tbl_genres gr on (bk.GENRE_ID = gr.GENRE_ID)
+join tbl_editors ed on (bk.LAUNCHED_BY = ed.EDITOR_ID)
+where bk.VOLUME_ID = :id', $params)->fetch();
+
+    // Check if book exists
+    if (!$book) {
+      ErrorController::notFound('Book not found');
+      return;
+    }
+
+    loadView('books/edit', [
+            'authors' => $this->authors,
+            'editors' => $this->publishers,
+            'collections' => $this->bookCollections,
+            'genres' => $this->genres,
+            'errors' => $errors,
+            'bookData' => $book
+    ]);
+  }
+
+  /**
+   * Update a listing
+   *
+   * @param array $params
+   * @return void
+   */
+  public function update($params) {
+
+
+  inspectAndDie($params);
+
+
+
+
+	  
+  }
+
 }
 
 ?>
