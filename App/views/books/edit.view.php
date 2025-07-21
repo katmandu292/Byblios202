@@ -11,7 +11,7 @@
 
 <?= loadPartial('flash') ?>
 
-        <form method="POST" action="/byblios/book/show/<?= $bookData->VOLUME_ID ?>">
+        <form method="POST" action="/byblios/book/update/<?= $bookData->VOLUME_ID ?>">
           <input type="hidden" name="_method" value="PUT">
           <br />
           <h2 class="text-2xl font-bold mb-6 text-center text-gray-500">

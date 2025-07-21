@@ -12,11 +12,16 @@ class BookController
   protected $genres;
   protected $bookCollections;
   protected $publishers;
+  protected $allowedFields;
+  protected $requiredFields;
+
 
   public function __construct()
   {
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
+    $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID'];
+    $this->requiredFields = ['VOL_TITLE', 'VOL_INFO'];
   }
 
 
@@ -111,19 +116,13 @@ where bk.VOLUME_ID = :id', $params)->fetch();
   {
       $this->getAttribs();
 
-      $allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID'];
-
-      $newBookData = array_intersect_key($_POST, array_flip($allowedFields));
+      $newBookData = array_intersect_key($_POST, array_flip($this->allowedFields));
 
       $newBookData = array_map('sanitize',$newBookData);
 
-//    $newBookData['user_id'] = 1;
-
-      $requiredFields = ['VOL_TITLE', 'VOL_INFO'];
-
       $errors = [];
 
-      foreach ($requiredFields as $field) {
+      foreach ($this->requiredFields as $field) {
          if (empty($newBookData[$field]) || !Validation::string($newBookData[$field])) {
            $errors[$field] = ucfirst($field) . ' is required';
          }
@@ -140,7 +139,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
             'bookData' => $newBookData
           ]);
       } else {
-//       inspectAndDie($newBookData);
+
           $fields = [];
           $values = [];
 
@@ -158,11 +157,11 @@ where bk.VOLUME_ID = :id', $params)->fetch();
           }
 
           $values = implode(', ', $values);
-          $insert = "insert into `tbl_books` ({$fields}) values ({$values})";
+          $insertSql = "insert into `tbl_books` ({$fields}) values ({$values})";
 
-          $this->db->query($insert, $newBookData);
+          $this->db->query($insertSql, $newBookData);
 
-          $_SESSION['flash'] = 'Book was successfully added !';
+          $_SESSION['flash'] = 'Successfully edited book !';
 
           redirect('/byblios');
 
@@ -237,7 +236,6 @@ where bk.VOLUME_ID = :id', $params)->fetch();
             'editors' => $this->publishers,
             'collections' => $this->bookCollections,
             'genres' => $this->genres,
-            'errors' => $errors,
             'bookData' => $book
     ]);
   }
@@ -250,13 +248,60 @@ where bk.VOLUME_ID = :id', $params)->fetch();
    */
   public function update($params) {
 
+      $id = $params['id'] ?? '';
 
-  inspectAndDie($params);
+      $params = [
+        'id' => $id
+      ];
 
 
+      $this->getAttribs();
+      $updatedBookData = array_intersect_key($_POST, array_flip($this->allowedFields));
+      $updatedBookData = array_map('sanitize',$updatedBookData);
+
+      $errors = [];
+
+      foreach ($this->requiredFields as $field) {
+         if (empty($updatedBookData[$field]) || !Validation::string($updatedBookData[$field])) {
+           $errors[$field] = ucfirst($field) . ' is required';
+         }
+      }
+
+      if (empty($errors)) {
+          $updateFields = [];
+
+          foreach (array_keys($updatedBookData) as $field) {
+             $updateFields[] = "{$field} = :{$field}";
+          }
+
+          $updateFields = implode(', ', $updateFields);
+ 
+          $updatedBookData['id'] = $id;
+
+          $updateQuery = "update `tbl_books` set {$updateFields} where VOLUME_ID = :id";
+
+          $this->db->query($updateQuery,$updatedBookData);
+
+          $_SESSION['success_message'] = 'Book was successfully added !';
+
+          redirect('/byblios/book/show/' . $id);
+
+          exit;
+      } else {
+// Reload view with errors
+          loadView('books/edit', [
+            'authors' => $this->authors,
+            'editors' => $this->publishers,
+            'collections' => $this->bookCollections,
+            'genres' => $this->genres,
+            'errors' => $errors,
+            'bookData' => $updatedBookData
+          ]);
+            exit;
+
+      }
 
 
-	  
   }
 
 }
