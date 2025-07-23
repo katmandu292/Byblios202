@@ -7,7 +7,12 @@ $router->get('/byblios/books', 'BookController@index');
 $router->get('/byblios/books/create', 'BookController@create');
 //outer->get('/byblios/publishers', 'controllers/publishers/index.php');
 //outer->get('/byblios/publishers/create', 'controllers/publishers/create.php');
+$router->get('/byblios/auth/login','UserController@login');
+$router->get('/byblios/auth/register','UserController@create');
 $router->put('/byblios/book/update/{id}', 'BookController@update');
+
 $router->post('/byblios/books', 'BookController@store');
+$router->post('/byblios/auth/register','UserController@store');
 $router->delete('/byblios/book/{id}', 'BookController@destroy');
+
 ?>
