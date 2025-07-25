@@ -77,29 +77,48 @@ class UserController
           'name' => $name,
           'email' => $email,
           'city' => $city,
-          'state' => $state,
+          'state' => $state
         ]
       ]);
       exit;
     }
 
 //     Check if email exists
-    $params = [
-      'email' => $email
-    ];
+    $params = [ 'email' => $email ];
 
     $user = $this->db->query('SELECT usr.USER_ID FROM tbl_users usr WHERE usr.USER_EMAIL = :email', $params)->fetch();
 
     if ($user) {
       $errors['email'] = 'That email already exists';
       loadView('users/create', [
-        'errors' => $errors
+        'errors' => $errors,
+        'user' => [
+          'name' => $name,
+          'email' => $email,
+          'city' => $city,
+          'state' => $state
+        ]
       ]);
       exit;
     }
  
+//     Create user account
+    $params = [
+      'name' => $name,
+      'email' => $email,
+      'city' => $city,
+      'state' => $state,
+      'password' => password_hash($password, PASSWORD_DEFAULT)
+    ];
 
+    $this->db->query('insert into tbl_users (USER_VALID, USER_ROLE, USER_NAME, USER_EMAIL, USER_VALID_EMAIL, USER_FULLNAME,
+                      USER_ADDR1, USER_ADDR2, USER_PWD) values (0, 111433001, \'just_arrived\', :email, 0, :name, :city,
+                      :state, :password)', $params);
 
+//     Get new user ID
+    $userId = $this->db->conn->lastInsertId();
+
+    redirect('/byblios/');
   }
 }
 ?>
