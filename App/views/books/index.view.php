@@ -14,7 +14,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
   <?php foreach($books as $book) : ?>
 
-          <!-- Job Listing <?= $book->VOLUME_ID ?> -->
+          <!-- Book <?= $book->VOLUME_ID ?> Listing -->
           <div class="rounded-lg shadow-md bg-white">
             <div class="p-4">
               <h2 class="text-xl font-semibold"><?= $book->VOL_TITLE ?></h2>
