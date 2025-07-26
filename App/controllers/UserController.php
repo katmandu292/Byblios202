@@ -118,7 +118,21 @@ class UserController
 //     Get new user ID
     $userId = $this->db->conn->lastInsertId();
 
+//     Set user session
+    Session::set('user', [
+      'id' => $userId,
+      'is_valid_user' => 0,
+      'username' => 'guest',
+      'userrole' => 111433001,
+      'name' => $name,
+      'email' => $email,
+      'is_valid_email' => 0,
+      'addr' => $city,
+      'county' => $state
+    ]);
+
     redirect('/byblios/');
   }
+
 }
 ?>
