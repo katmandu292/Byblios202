@@ -50,7 +50,7 @@
         </div>
       </div>
 
-        <a href="../byblios/books" class="block text-xl text-center">
+        <a href="/byblios/book" class="block text-xl text-center">
           <i class="fa fa-arrow-alt-circle-right"></i>
           Show All Books
         </a>

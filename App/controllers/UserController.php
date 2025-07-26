@@ -16,6 +16,7 @@ class UserController
     $this->db = new Database($config);
   }
 
+
   /**
    * Show the login page
    * 
@@ -26,6 +27,7 @@ class UserController
     loadView('users/login');
   }
 
+
   /**
    * Show the register page
    * 
@@ -35,6 +37,7 @@ class UserController
   {
     loadView('users/create');
   }
+
 
   /**
    * Store user in database
@@ -134,5 +137,20 @@ class UserController
     redirect('/byblios/');
   }
 
+
+  /**
+   * Logout a user and kill session
+   * 
+   * @return void
+   */
+  public function logout()
+  {
+    Session::clearAll();
+
+    $params = session_get_cookie_params();
+    setcookie('PHPSESSID', '', time() - 86400, $params['path'], $params['domain']);
+
+    redirect('/byblios');
+  }
 }
 ?>
