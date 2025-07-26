@@ -9,7 +9,7 @@
       'errors' => $errors ?? []
     ]) ?>
 <?php endif; ?>
-    <form method="POST" action="/auth/login">
+    <form method="POST" action="/byblios/auth/login">
       <div class="mb-4">
         <input type="text" name="email" placeholder="Email Address" class="w-full px-4 py-2 border rounded focus:outline-none" />
       </div>

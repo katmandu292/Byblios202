@@ -14,6 +14,7 @@ $router->put('/byblios/book/update/{id}', 'BookController@update');
 
 $router->post('/byblios/books', 'BookController@store');
 $router->post('/byblios/auth/register','UserController@store');
+$router->post('/byblios/auth/login','UserController@authenticate');
 $router->post('/byblios/auth/logout','UserController@logout');
 
 $router->delete('/byblios/book/{id}', 'BookController@destroy');

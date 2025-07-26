@@ -152,5 +152,81 @@ class UserController
 
     redirect('/byblios');
   }
+
+
+  /**
+   * Authenticate a user with email and password
+   * 
+   * @return void
+   */
+  public function authenticate()
+  {
+
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $errors = [];
+
+//      Validation
+    if (!Validation::email($email)) {
+      $errors['email'] = 'Please enter a valid email';
+    }
+
+    if (!Validation::string($password, 6, 50)) {
+      $errors['password'] = 'Password must be at least 6 characters';
+    }
+
+//      Check for errors
+    if (!empty($errors)) {
+      loadView('users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
+
+//      Check for email
+    $params = [ 'email' => $email ];
+
+    $user = $this->db->query('select usr.USER_ID, usr.USER_NAME, usr.USER_FULLNAME,
+           usr.USER_PWD, usr.USER_ROLE, usr.USER_EMAIL, usr.USER_ADDR1, usr.USER_ADDR2
+from tbl_users usr where usr.USER_VALID_EMAIL = 1 and usr.USER_VALID = 1
+and usr.USER_EMAIL = :email', $params)->fetch();
+
+    if (!$user) {
+      $errors['email'] = 'Incorrect credentials';
+      loadView('/byblios/users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
+
+//     Check if password is correct
+    if (!password_verify($password, $user->USER_PWD)) {
+      $errors['email'] = 'Incorrect credentials';
+      loadView('users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
+
+    $userId = $this->db->conn->lastInsertId();
+
+//     Set user session
+    Session::set('user', [
+      'id' => $user->USER_ID,
+      'is_valid_user' => 1,
+      'username' => $user->USER_NAME,
+      'userrole' => $user->USER_ROLE,
+      'name' => $user->USER_FULLNAME,
+      'email' => $user->USER_EMAIL,
+      'is_valid_email' => 1,
+      'addr' => $user->USER_ADDR1,
+      'county' => $user->USER_ADDR2
+    ]);
+
+    redirect('/byblios/');
+
+
+  }
 }
 ?>
