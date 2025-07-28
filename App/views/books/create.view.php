@@ -11,7 +11,7 @@
 
 <?= loadPartial('flash') ?>
 
-        <form method="POST" action="../books">
+        <form method="POST" action="/byblios/books">
 
           <br />
           <h2 class="text-2xl font-bold mb-6 text-center text-gray-500">

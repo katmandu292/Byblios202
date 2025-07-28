@@ -4,6 +4,8 @@ namespace App\controllers;
 
 use Framework\Database;
 use Framework\Validation;
+use Framework\Session;
+use Framework\Authorization;
 
 class BookController
 {
@@ -21,7 +23,7 @@ class BookController
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
     $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID'];
-    $this->requiredFields = ['VOL_TITLE', 'VOL_INFO'];
+    $this->requiredFields = ['VOL_TITLE', 'VOL_INFO', 'OWNER_ID'];
   }
 
 
@@ -84,14 +86,12 @@ join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID) order by bk.VOLUME_ID desc')->
   {
     $id = $params['id'] ?? '';
 
-    $params = [
-      'id' => $id
-    ];
+    $params = [ 'id' => $id ];
 
     $book = $this->db->query('select bk.VOLUME_ID, bk.AUTHOR_ID, au.AUTH_NAME, bk.GENRE_ID,
 bk.COLLECT_ID, gr.GENRE_LABEL, bk.LAUNCHED_BY, bk.ISBN, bk.VOL_TITLE, bk.VOL_INFO,
-ed.EDITOR_NAME,
-bk.LAUNCH_YEAR from tbl_books bk join tbl_authors au on (bk.AUTHOR_ID = au.PERS_ID)
+ed.EDITOR_NAME, bk.OWNER_ID, bk.LAUNCH_YEAR
+from tbl_books bk join tbl_authors au on (bk.AUTHOR_ID = au.PERS_ID)
 join tbl_genres gr on (bk.GENRE_ID = gr.GENRE_ID)
 join tbl_editors ed on (bk.LAUNCHED_BY = ed.EDITOR_ID)
 where bk.VOLUME_ID = :id', $params)->fetch();
@@ -107,6 +107,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
     ]);
   }
 
+
   /**
    * Store data in database
    *
@@ -120,6 +121,8 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $newBookData = array_map('sanitize',$newBookData);
 
+      $newBookData['OWNER_ID'] = Session::get('user')['id'];
+
       $errors = [];
 
       foreach ($this->requiredFields as $field) {
@@ -131,6 +134,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
       if (!empty($errors)) {
 // Reload view with errors
           loadView('books/create', [
+            'user_id' => Session::get('user')['id'],
             'authors' => $this->authors,
             'editors' => $this->publishers,
             'collections' => $this->bookCollections,
@@ -157,6 +161,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
           }
 
           $values = implode(', ', $values);
+
           $insertSql = "insert into `tbl_books` ({$fields}) values ({$values})";
 
           $this->db->query($insertSql, $newBookData);
@@ -171,6 +176,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
   }
 
+
   /**
    * Delete a book
    *
@@ -181,17 +187,21 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
     $id = $params['id'] ?? '';
 
-    $params = [
-      'id' => $id
-    ];
+    $params = [ 'id' => $id ];
 
-    $book = $this->db->query('select bk.VOLUME_ID, bk.VOL_TITLE,
+    $book = $this->db->query('select bk.VOLUME_ID, bk.VOL_TITLE, bk.OWNER_ID,
 bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
-
-    // Check if book exists
+    $ownerId = (int) $book->OWNER_ID;
+//     Check if book exists
     if (!$book) {
       ErrorController::notFound('Book not found');
       return;
+    }
+
+//     Authorization
+    if (!Authorization::isOwner($ownerId)) {
+      $_SESSION['error_message'] = 'You are not authorized for this operation';
+      return redirect('/byblios/book/show/' . $book->VOLUME_ID);
     }
 
     $this->db->query('delete from tbl_books where VOLUME_ID = :id',$params);
@@ -250,14 +260,15 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $id = $params['id'] ?? '';
 
-      $params = [
-        'id' => $id
-      ];
-
+      $params = [ 'id' => $id ];
 
       $this->getAttribs();
+
       $updatedBookData = array_intersect_key($_POST, array_flip($this->allowedFields));
+
       $updatedBookData = array_map('sanitize',$updatedBookData);
+
+      $updatedBookData['OWNER_ID'] = Session::get('user')['id'];
 
       $errors = [];
 
@@ -282,7 +293,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
           $this->db->query($updateQuery,$updatedBookData);
 
-          $_SESSION['success_message'] = 'Book was successfully added !';
+          $_SESSION['success_message'] = 'The book was successfully updated !';
 
           redirect('/byblios/book/show/' . $id);
 

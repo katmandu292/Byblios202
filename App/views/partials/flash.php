@@ -8,9 +8,9 @@
 
   if (isset($_SESSION['error_message'])) {
      echo '<div class="message bg-red-100 p-3 my-3">';
-     echo $_SESSION['success_message'];
+     echo $_SESSION['error_message'];
      echo '</div>';
-     unset($_SESSION['success_message']);
+     unset($_SESSION['error_message']);
   }
 ?>
 
