@@ -22,7 +22,7 @@ class BookController
   {
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
-    $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID'];
+    $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID', 'OWNER_ID'];
     $this->requiredFields = ['VOL_TITLE', 'VOL_INFO', 'OWNER_ID'];
   }
 
@@ -223,13 +223,11 @@ bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
 
     $id = $params['id'] ?? '';
 
-    $params = [
-      'id' => $id
-    ];
+    $params = [ 'id' => $id ];
 
     $book = $this->db->query('select bk.VOLUME_ID, bk.AUTHOR_ID, au.AUTH_NAME, bk.GENRE_ID,
 bk.COLLECT_ID, gr.GENRE_LABEL, bk.LAUNCHED_BY, bk.ISBN, bk.VOL_TITLE, bk.VOL_INFO,
-ed.EDITOR_NAME,
+ed.EDITOR_NAME, bk.OWNER_ID,
 bk.LAUNCH_YEAR from tbl_books bk join tbl_authors au on (bk.AUTHOR_ID = au.PERS_ID)
 join tbl_genres gr on (bk.GENRE_ID = gr.GENRE_ID)
 join tbl_editors ed on (bk.LAUNCHED_BY = ed.EDITOR_ID)
@@ -268,7 +266,12 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $updatedBookData = array_map('sanitize',$updatedBookData);
 
-      $updatedBookData['OWNER_ID'] = Session::get('user')['id'];
+      $updatedBookData['OWNER_ID'] = (int) $updatedBookData['OWNER_ID'];
+
+      if (!Authorization::isOwner($updatedBookData->OWNER_ID)) {
+         Session::setFlashMessage('error_message', 'You are not authorized to update this listing');
+         return redirect('/byblios/book/show/' . $id);
+      }
 
       $errors = [];
 
