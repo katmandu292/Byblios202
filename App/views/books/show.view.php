@@ -1,6 +1,9 @@
 <?= loadPartial('head') ?>
 <?= loadPartial('navbar') ?>
 <?= loadPartial('top-banner') ?>
+<?php
+  use Framework\Authorization;
+?>
 
 <section class="container mx-auto p-4 mt-4">
   <div class="rounded-lg shadow-md bg-white p-3">
@@ -10,7 +13,7 @@
         <i class="fa fa-arrow-alt-circle-left"></i>
         Back To Book List
       </a>
-<!--    php if (Framework\Authorization::isOwner($listing->user_id)) :-->
+<?php   if (Authorization::isOwner($book->OWNER_ID)) : ?>
         <div class="flex space-x-4 ml-4">
           <a href="/byblios/book/edit/<?= $book->VOLUME_ID ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Edit</a>
           <form method="POST">
@@ -20,7 +23,7 @@
           <!-- End Delete Form -->
           </form>
         </div>
-<!--    php endif -->
+<?php  endif; ?>
     </div>
     <div class="p-4">
       <h2 class="text-xl font-semibold"><?= $book->VOL_TITLE ?></h2>

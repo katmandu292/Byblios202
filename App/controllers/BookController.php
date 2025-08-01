@@ -23,7 +23,7 @@ class BookController
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
     $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID', 'OWNER_ID'];
-    $this->requiredFields = ['VOL_TITLE', 'VOL_INFO', 'OWNER_ID'];
+    $this->requiredFields = ['VOL_TITLE', 'VOL_INFO'];
   }
 
 
@@ -200,13 +200,15 @@ bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
 
 //     Authorization
     if (!Authorization::isOwner($ownerId)) {
-      $_SESSION['error_message'] = 'You are not authorized for this operation';
+//    $_SESSION['error_message'] = 'You are not authorized for this operation';
+      Session::setFlashMessage('error_message','You are not authorized for this operation');
       return redirect('/byblios/book/show/' . $book->VOLUME_ID);
     }
 
     $this->db->query('delete from tbl_books where VOLUME_ID = :id',$params);
 
-    $_SESSION['success_message'] = 'Successfully deleted the Book';
+//  $_SESSION['success_message'] = 'Successfully deleted the Book';
+    Session::setFlashMessage('success_message', 'Successfully deleted the Book');
 
     redirect('/byblios');
   }
@@ -260,15 +262,24 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $params = [ 'id' => $id ];
 
+      $bookCheck = $this->db->query('select bk.VOLUME_ID, bk.OWNER_ID from tbl_books bk where bk.VOLUME_ID = :id', $params)->fetch();
+
+      if (!$bookCheck) {
+         ErrorController::notFound('Book not found');
+         return;
+      }
+
       $this->getAttribs();
 
       $updatedBookData = array_intersect_key($_POST, array_flip($this->allowedFields));
 
       $updatedBookData = array_map('sanitize',$updatedBookData);
 
-      $updatedBookData['OWNER_ID'] = (int) $updatedBookData['OWNER_ID'];
+      $sessionUser = Session::get('user');
+      
+      $userId = (int) $bookCheck->OWNER_ID;
 
-      if (!Authorization::isOwner($updatedBookData->OWNER_ID)) {
+      if (!Authorization::isOwner($userId)) {
          Session::setFlashMessage('error_message', 'You are not authorized to update this listing');
          return redirect('/byblios/book/show/' . $id);
       }
@@ -292,11 +303,12 @@ where bk.VOLUME_ID = :id', $params)->fetch();
  
           $updatedBookData['id'] = $id;
 
-          $updateQuery = "update `tbl_books` set {$updateFields} where VOLUME_ID = :id";
+          $updateQuery = "update tbl_books set {$updateFields} where VOLUME_ID = :id";
 
           $this->db->query($updateQuery,$updatedBookData);
 
-          $_SESSION['success_message'] = 'The book was successfully updated !';
+//        $_SESSION['success_message'] = 'The book was successfully updated !';
+          Session::setFlashMessage('success_message','The book was successfully updated !');
 
           redirect('/byblios/book/show/' . $id);
 
