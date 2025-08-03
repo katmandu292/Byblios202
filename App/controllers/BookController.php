@@ -90,7 +90,7 @@ join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID) order by bk.VOLUME_ID desc')->
 
     $book = $this->db->query('select bk.VOLUME_ID, bk.AUTHOR_ID, au.AUTH_NAME, bk.GENRE_ID,
 bk.COLLECT_ID, gr.GENRE_LABEL, bk.LAUNCHED_BY, bk.ISBN, bk.VOL_TITLE, bk.VOL_INFO,
-ed.EDITOR_NAME, bk.OWNER_ID, bk.LAUNCH_YEAR
+ed.EDITOR_NAME, bk.LAUNCH_YEAR, bk.OWNER_ID
 from tbl_books bk join tbl_authors au on (bk.AUTHOR_ID = au.PERS_ID)
 join tbl_genres gr on (bk.GENRE_ID = gr.GENRE_ID)
 join tbl_editors ed on (bk.LAUNCHED_BY = ed.EDITOR_ID)
@@ -100,6 +100,9 @@ where bk.VOLUME_ID = :id', $params)->fetch();
     if (!$book) {
       ErrorController::notFound('Book not found');
       return;
+    } else {
+      $convertedOwnerID = (int) $book->OWNER_ID;
+      $book->OWNER_ID = $convertedOwnerID;
     }
 
     loadView('books/show', [

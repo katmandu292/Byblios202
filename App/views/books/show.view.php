@@ -2,6 +2,7 @@
 <?= loadPartial('navbar') ?>
 <?= loadPartial('top-banner') ?>
 <?php
+  use Framework\Session;
   use Framework\Authorization;
 ?>
 
@@ -57,7 +58,7 @@
     <p><?= $book->ISBN ?></p>
   </div>
   <p class="my-5">
-    Put "AUTHOR_ID" as the subject of your email and attach your resume.
+    User from Session: <?= var_dump(Session::get('user')['id']) ?>, Book Owner: <?= var_dump($book->OWNER_ID) ?>
   </p>
   <a href="mailto:<?= $book->AUTHOR_ID ?>" class="block w-full text-center px-5 py-2.5 shadow-sm rounded border text-base font-medium cursor-pointer text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
     Apply Now

@@ -30,7 +30,7 @@ class HomeController
                          join tbl_editors ed on (bk.LAUNCHED_BY = ed.EDITOR_ID)
                          join tbl_genres gr oN (bk.GENRE_ID = gr.GENRE_ID) limit 6')->fetchAll();
 
-    loadView('partials/home', [
+    loadView('home', [
       'books' => $books
     ]);
   }
