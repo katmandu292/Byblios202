@@ -13,6 +13,7 @@
 
         <form method="POST" action="/byblios/book/update/<?= $bookData->VOLUME_ID ?>">
           <input type="hidden" name="_method" value="PUT">
+          <input type="hidden" name="UPDATED_AT" value="<?= date('Y-m-d H:i:s') ?>">
           <br />
           <h2 class="text-2xl font-bold mb-6 text-center text-gray-500">
             Book Info

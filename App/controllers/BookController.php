@@ -22,7 +22,7 @@ class BookController
   {
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
-    $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID', 'OWNER_ID'];
+    $this->allowedFields = ['VOL_TITLE', 'VOL_INFO', 'LAUNCH_YEAR', 'ISBN', 'GENRE_ID', 'LAUNCHED_BY', 'AUTHOR_ID', 'COLLECT_ID', 'OWNER_ID', 'UPDATED_AT'];
     $this->requiredFields = ['VOL_TITLE', 'VOL_INFO'];
   }
 
