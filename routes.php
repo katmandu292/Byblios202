@@ -2,6 +2,8 @@
 
 $router->get('/byblios/', 'HomeController@index');
 $router->get('/byblios/book', 'BookController@index');
+$router->get('/byblios/editor', 'EditorController@index');
+$router->get('/byblios/editor/show/{id}', 'EditorController@show');
 $router->get('/byblios/book/show/{id}', 'BookController@show');
 $router->get('/byblios/book/edit/{id}', 'BookController@edit',['auth']);
 $router->get('/byblios/book/create', 'BookController@create',['auth']);
