@@ -7,25 +7,31 @@ use Framework\Validation;
 use Framework\Session;
 use Framework\Authorization;
 
+
 class EditorController {
 
   protected $db;
+  protected $allowedFields;
+  protected $requiredFields;
 
   public function __construct()
   {
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
+    $this->allowedFields = [ 'OWNER_ID', 'EDITOR_NAME', 'ADDRESS', 'EDITOR_INFO' ];
+    $this->requiredFields = [ 'OWNER_ID', 'EDITOR_NAME', 'ADDRESS', 'EDITOR_INFO' ];
   }
+
 
   /**
    * Show all publishers
-   * 
+   *
    * @return void
    */
   public function index()
   {
     $editorsList = $this->db->query('select ed.EDITOR_ID, ed.EDITOR_NAME,
- ed.OWNER_ID, ed.ADDRESS, ed.EDITOR_INFO, usr.USER_NAME, usr.USER_FULLNAME 
+ ed.OWNER_ID, ed.ADDRESS, ed.EDITOR_INFO, usr.USER_NAME, usr.USER_FULLNAME
 from tbl_editors ed
 join tbl_users usr on (ed.OWNER_ID = usr.USER_ID)')->fetchAll();
 
@@ -34,6 +40,20 @@ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID)')->fetchAll();
       'editors' => $editorsList
     ]);
   }
+
+
+  /**
+   * Show the create publisher form
+   *
+   * @return void
+   */
+  public function create()
+  {
+    $publisherData = [];
+    loadView('editor/create', $publisherData);
+  }
+
+
 
   /**
    * Show a single publisher
@@ -69,8 +89,65 @@ where ed.EDITOR_ID = :id', $params)->fetch();
   }
 
   /**
+   * Store data in database
+   *
+   * @return void
+   */
+  public function store()
+  {
+     $newEditorData = array_intersect_key($_POST, array_flip($this->allowedFields));
+     $newEditorData = array_map('sanitize',$newEditorData);
+     $newEditorData['OWNER_ID'] = Session::get('user')['id'];
+
+     $errors = [];
+
+     foreach ($this->requiredFields as $field) {
+         if (empty($newEditorData[$field]) || !Validation::string($newEditorData[$field])) {
+           $errors[$field] = ucfirst($field) . ' is required';
+         }
+     }
+
+     if (empty($errors)) {
+        $fields = [];
+        $values = [];
+
+        foreach ($newEditorData as $field => $value) {
+           $fields[] = $field;
+        }
+
+        $fields = implode(', ', $fields);
+
+        foreach ($newEditorData as $field => $value) {
+             if ($value === '') {
+                 $newEditorData[$field] = null;
+             }
+             $values[] = ":" . $field;
+        }
+
+        $values = implode(', ', $values);
+
+        $insertSql = "insert into `tbl_editors` ({$fields}) values ({$values})";
+
+        $this->db->query($insertSql, $newEditorData);
+
+        Session::setFlashMessage('success_message','Successfully added a new Publisher');
+
+        redirect('/byblios/editor');
+
+     } else {
+
+        loadView('editor/create',[
+             'user_id' => Session::get('user')['id'],
+             'publisherData' => $newEditorData
+        ]);
+
+     }
+  }
+
+
+  /**
    * Show the Publisher edit form
-   * 
+   *
    * @param array $params
    * @return void
    */
@@ -107,9 +184,10 @@ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID) where ed.EDITOR_ID = :id',$par
     ]);
   }
 
+
   /**
    * Update a publisher
-   * 
+   *
    * @param array $params
    * @return void
    */
@@ -121,21 +199,18 @@ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID) where ed.EDITOR_ID = :id',$par
       'id' => $id
     ];
 
-    $publisher = $this->db->query('select ed.EDITOR_ID, ed.EDITOR_NAME, ed.OWNER_ID,
-ed.ADDRESS, ed.EDITOR_INFO from tbl_editors ed
-where ed.EDITOR_ID = :id',$params)->fetch();
+    $editorCheck = $this->db->query('select ed.OWNER_ID from tbl_editors ed where ed.EDITOR_ID = :id',$params)->fetch();
 
 //     Check if listing exists
-    if (!$publisher) {
+    if (!$editorCheck) {
       ErrorController::notFound('Listing not found');
       return;
     }
 
-    $convertedOwnerId = (int) $publisher->OWNER_ID;
-    $publisher->OWNER_ID = $convertedOwnerId;
+    $convertedOwnerId = (int) $editorCheck->OWNER_ID;
 
 //     Authorization
-    if (!Authorization::isOwner($publisher->OWNER_ID)) {
+    if (!Authorization::isOwner($convertedOwnerId)) {
       Session::setFlashMessage('error_message', 'You are not authorized to update this publisher');
       return redirect('/byblios/editor');
     }
@@ -158,14 +233,8 @@ where ed.EDITOR_ID = :id',$params)->fetch();
       }
     }
 
-    if (!empty($errors)) {
-      loadView('editor/edit', [
-        'publisherData' => $publisher,
-        'errors' => $errors
-      ]);
-      exit;
-    } else {
-//       Submit to database
+    if (empty($errors)) {
+
       $updateFields = [];
 
       foreach (array_keys($updateValues) as $field) {
@@ -183,6 +252,13 @@ where ed.EDITOR_ID = :id',$params)->fetch();
       Session::setFlashMessage('success_message', 'Publisher updated');
 
       redirect('/byblios/editor/show/' . $id);
+    } else {
+
+      loadView('editor/edit', [
+        'publisherData' => $publisher,
+        'errors' => $errors
+      ]);
+      exit;
     }
   }
 

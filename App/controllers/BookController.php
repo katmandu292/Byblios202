@@ -169,9 +169,9 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
           $this->db->query($insertSql, $newBookData);
 
-          $_SESSION['flash'] = 'Successfully edited book !';
+          Session::setFlashMessage('success_message','Successfully saved the book !');
 
-          redirect('/byblios');
+          redirect('/byblios/book');
 
           exit;
 
