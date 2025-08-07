@@ -203,14 +203,12 @@ bk.VOL_INFO from tbl_books bk where bk.VOLUME_ID = :id',$params)->fetch();
 
 //     Authorization
     if (!Authorization::isOwner($ownerId)) {
-//    $_SESSION['error_message'] = 'You are not authorized for this operation';
       Session::setFlashMessage('error_message','You are not authorized for this operation');
       return redirect('/byblios/book/show/' . $book->VOLUME_ID);
     }
 
     $this->db->query('delete from tbl_books where VOLUME_ID = :id',$params);
 
-//  $_SESSION['success_message'] = 'Successfully deleted the Book';
     Session::setFlashMessage('success_message', 'Successfully deleted the Book');
 
     redirect('/byblios');
@@ -278,8 +276,6 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $updatedBookData = array_map('sanitize',$updatedBookData);
 
-      $sessionUser = Session::get('user');
-      
       $userId = (int) $bookCheck->OWNER_ID;
 
       if (!Authorization::isOwner($userId)) {
@@ -310,7 +306,6 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
           $this->db->query($updateQuery,$updatedBookData);
 
-//        $_SESSION['success_message'] = 'The book was successfully updated !';
           Session::setFlashMessage('success_message','The book was successfully updated !');
 
           redirect('/byblios/book/show/' . $id);
