@@ -25,5 +25,6 @@ $router->post('/byblios/auth/login','UserController@authenticate',['guest']);
 $router->post('/byblios/auth/logout','UserController@logout',['auth']);
 
 $router->delete('/byblios/book/show/{id}', 'BookController@destroy',['auth']);
+$router->delete('/byblios/editor/show/{id}', 'EditorController@destroy',['auth']);
 
 ?>

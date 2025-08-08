@@ -54,7 +54,6 @@ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID)')->fetchAll();
   }
 
 
-
   /**
    * Show a single publisher
    *
@@ -87,6 +86,7 @@ where ed.EDITOR_ID = :id', $params)->fetch();
       'publisher' => $publisher
     ]);
   }
+
 
   /**
    * Store data in database
@@ -142,6 +142,43 @@ where ed.EDITOR_ID = :id', $params)->fetch();
         ]);
 
      }
+  }
+
+
+  /**
+   * Delete an Editor
+   *
+   * @param array $params
+   * @return void
+   */
+  public function destroy($params) {
+
+    $id = $params['id'] ?? '';
+
+    $params = [ 'id' => $id ];
+
+    $editor = $this->db->query('select ed.EDITOR_ID, ed.OWNER_ID
+ from tbl_editors ed
+ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID) where ed.EDITOR_ID = :id',$params)->fetch();
+
+    $ownerId = (int) $editor->OWNER_ID;
+//     Check if book exists
+    if (!$editor) {
+      ErrorController::notFound('Publisher not found');
+      return;
+    }
+
+//     Authorization
+    if (!Authorization::isOwner($ownerId)) {
+      Session::setFlashMessage('error_message','You are not authorized for this operation');
+      return redirect('/byblios/editor/show/' . $editor->EDITOR_ID);
+    }
+
+    $this->db->query('delete from tbl_editors where EDITOR_ID = :id',$params);
+
+    Session::setFlashMessage('success_message', 'Successfully deleted the Publisher');
+
+    redirect('/byblios/editor');
   }
 
 
