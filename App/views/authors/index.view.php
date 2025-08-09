@@ -30,11 +30,11 @@
                   >
                 </li>
                 <li class="mb-2">
-                  <strong>Location:</strong> <span><?= $writer->ADDRESS ?></span>
+                  <strong>Born In:</strong> <span><?= $writer->BIRTH_YEAR ?></span>
 <!--             ,<span>Coding</span  -->
                 </li>
               </ul>
-              <a href="/byblios/authors/show/<?= $writer->AUTH_BIO ?>"
+              <a href="/byblios/authors/show/<?= $writer->PERS_ID ?>"
                 class="block w-full text-center px-5 py-2.5 shadow-sm rounded border text-base font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
                 Details
               </a>

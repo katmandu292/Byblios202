@@ -40,6 +40,82 @@ order by aut.PERS_ID')->fetchAll();
     ]);
   }
 
-}
 
+
+
+
+  /**
+   * Show an Author
+   *
+   * @param array $params
+   * @return void
+   */
+  public function show($params)
+  {
+    $id = $params['id'] ?? '';
+
+    $params = [ 'id' => $id ];
+
+    $author = $this->db->query('select aut.PERS_ID, aut.OWNER_ID,
+aut.BIRTH_YEAR, aut.AUTH_NAME,
+aut.AUTH_BIO, usr.USER_FULLNAME, usr.USER_NAME
+from tbl_authors aut join tbl_users usr
+on (aut.OWNER_ID = usr.USER_ID)
+where aut.PERS_ID = :id', $params)->fetch();
+
+    // Check if the Author exists in the database
+    if (!$author) {
+      ErrorController::notFound('Author not found');
+      return;
+    } else {
+      $convertedOwnerID = (int) $author->OWNER_ID;
+      $author->OWNER_ID = $convertedOwnerID;
+    }
+
+    loadView('authors/show', [
+      'author' => $author
+    ]);
+  }
+
+
+  /**
+   * Show an Author edit form
+   *
+   * @param array $params
+   * @return void
+   */
+  public function edit($params)
+  {
+    $id = $params['id'] ?? '';
+
+    $params = [
+      'id' => $id
+    ];
+
+    $author = $this->db->query('select aut.PERS_ID, aut.OWNER_ID,
+ aut.BIRTH_YEAR, aut.AUTH_NAME, aut.AUTH_BIO, usr.USER_FULLNAME, usr.USER_NAME
+ from tbl_authors aut join tbl_users usr
+ on (aut.OWNER_ID = usr.USER_ID) where aut.PERS_ID = :id',$params)->fetch();
+
+//     Check if the author exists
+    if (!$author) {
+      ErrorController::notFound('Publisher not found');
+      return;
+    }
+
+    $convertedOwnerId = (int) $author->OWNER_ID;
+    $author->OWNER_ID = $convertedOwnerId;
+
+//     Authorization
+    if (!Authorization::isOwner($author->OWNER_ID)) {
+      Session::setFlashMessage('error_message', 'You are not authorized to update this author');
+      return redirect('/byblios/editor/show/' . $author->id);
+    }
+
+    loadView('authors/edit', [
+      'authorData' => $author
+    ]);
+  }
+
+}
 ?>

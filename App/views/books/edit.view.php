@@ -109,7 +109,7 @@
             Save
           </button>
           <a
-            href="/byblios/book/edit/<?= $bookData->VOLUME_ID ?>"
+            href="/byblios/book/show/<?= $bookData->VOLUME_ID ?>"
             class="block text-center w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded focus:outline-none"
           >
             Cancel
