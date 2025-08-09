@@ -22,7 +22,7 @@
           <div class="mb-4">
             <input
               type="text"
-              name="EDITOR_NAME"
+              name="AUTH_NAME"
               placeholder="Writer's Name"
               value="<?= $authorData->AUTH_NAME ?? '' ?>"
               class="w-full px-4 py-2 border rounded focus:outline-none"
@@ -45,7 +45,7 @@
 
           <div class="mb-4">
              <textarea
-              name="EDITOR_INFO"
+              name="AUTH_BIO"
               placeholder="Writer's Biography"
               class="w-full px-4 py-2 border rounded focus:outline-none"
              ><?= $authorData->AUTH_BIO ?? '' ?></textarea>            

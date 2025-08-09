@@ -20,9 +20,11 @@ $router->get('/byblios/auth/register','UserController@create',['guest']);
 
 $router->put('/byblios/book/update/{id}', 'BookController@update',['auth']);
 $router->put('/byblios/editor/update/{id}', 'EditorController@update',['auth']);
+$router->put('/byblios/authors/update/{id}', 'AuthorController@update',['auth']);
 
 $router->post('/byblios/books', 'BookController@store',['auth']);
 $router->post('/byblios/editor', 'EditorController@store',['auth']);
+$router->post('/byblios/authors', 'AuthorController@store',['auth']);
 $router->post('/byblios/auth/register','UserController@store',['auth']);
 $router->post('/byblios/auth/login','UserController@authenticate',['guest']);
 $router->post('/byblios/auth/logout','UserController@logout',['auth']);

@@ -98,8 +98,20 @@ where ed.EDITOR_ID = :id', $params)->fetch();
      $newEditorData = array_intersect_key($_POST, array_flip($this->allowedFields));
      $newEditorData = array_map('sanitize',$newEditorData);
      $newEditorData['OWNER_ID'] = Session::get('user')['id'];
+     $chkName = $newEditorData['EDITOR_NAME'];
+
+     $params = [ 'EDITOR_NAME' => $chkName ];
+
+     $publisher = $this->db->query('select ed.EDITOR_ID, ed.EDITOR_NAME, ed.OWNER_ID
+  from tbl_editors ed
+  join tbl_users usr on (ed.OWNER_ID = usr.USER_ID)
+  where ed.EDITOR_NAME = :EDITOR_NAME', $params)->fetch();
 
      $errors = [];
+
+     if($publisher) {
+         $errors['EDITOR_NAME'] = 'This is a duplicated Publisher-s Name';
+     }
 
      foreach ($this->requiredFields as $field) {
          if (empty($newEditorData[$field]) || !Validation::string($newEditorData[$field])) {
@@ -137,8 +149,8 @@ where ed.EDITOR_ID = :id', $params)->fetch();
      } else {
 
         loadView('editor/create',[
-             'user_id' => Session::get('user')['id'],
-             'publisherData' => $newEditorData
+             'publisherData' => $newEditorData,
+             'errors' => $errors
         ]);
 
      }
@@ -292,7 +304,7 @@ join tbl_users usr on (ed.OWNER_ID = usr.USER_ID) where ed.EDITOR_ID = :id',$par
     } else {
 
       loadView('editor/edit', [
-        'publisherData' => $publisher,
+        'publisherData' => $updateValues,
         'errors' => $errors
       ]);
       exit;

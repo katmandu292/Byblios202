@@ -122,9 +122,18 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       $newBookData = array_intersect_key($_POST, array_flip($this->allowedFields));
 
+      $params = [ 'titlu' => $newBookData['VOL_TITLE'] ];
+
+      $chkBook = $this->db->query('select bk.VOLUME_ID, bk.OWNER_ID
+ from tbl_books bk where bk.VOL_TITLE = :titlu', $params)->fetch();
+
       $newBookData = array_map('sanitize',$newBookData);
 
       $newBookData['OWNER_ID'] = Session::get('user')['id'];
+
+      if ($chkBook) {
+         $errors['VOL_TITLE'] = 'This title is already registered with Byblios';
+      }
 
       $errors = [];
 
@@ -137,7 +146,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
       if (!empty($errors)) {
 // Reload view with errors
           loadView('books/create', [
-            'user_id' => Session::get('user')['id'],
+//          'user_id' => Session::get('user')['id'],
             'authors' => $this->authors,
             'editors' => $this->publishers,
             'collections' => $this->bookCollections,
@@ -252,7 +261,7 @@ where bk.VOLUME_ID = :id', $params)->fetch();
   }
 
   /**
-   * Update a listing
+   * Update a Book
    *
    * @param array $params
    * @return void
