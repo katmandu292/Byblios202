@@ -133,9 +133,9 @@ where bk.VOLUME_ID = :id', $params)->fetch();
 
       if ($chkBook) {
          $errors['VOL_TITLE'] = 'This title is already registered with Byblios';
+      } else {
+         $errors = [];
       }
-
-      $errors = [];
 
       foreach ($this->requiredFields as $field) {
          if (empty($newBookData[$field]) || !Validation::string($newBookData[$field])) {

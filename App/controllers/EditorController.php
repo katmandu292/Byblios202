@@ -107,10 +107,10 @@ where ed.EDITOR_ID = :id', $params)->fetch();
   join tbl_users usr on (ed.OWNER_ID = usr.USER_ID)
   where ed.EDITOR_NAME = :EDITOR_NAME', $params)->fetch();
 
-     $errors = [];
-
      if($publisher) {
          $errors['EDITOR_NAME'] = 'This is a duplicated Publisher-s Name';
+     } else {
+         $errors = [];
      }
 
      foreach ($this->requiredFields as $field) {
