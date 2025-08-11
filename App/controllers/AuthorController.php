@@ -18,7 +18,7 @@ class AuthorController
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
     $this->allowedFields = [ 'PERS_ID', 'OWNER_ID', 'BIRTH_YEAR', 'AUTH_NAME', 'AUTH_BIO', 'UPDATED_AT' ];
-    $this->requiredFields = [ 'AUTH_NAME', '' ];
+    $this->requiredFields = [ 'AUTH_NAME', 'BIRTH_YEAR' ];
   }
 
 
@@ -41,7 +41,16 @@ order by aut.PERS_ID')->fetchAll();
   }
 
 
-
+  /**
+   * Show the create author form
+   *
+   * @return void
+   */
+  public function create()
+  {
+    $authorData = [];
+    loadView('authors/create', $authorData);
+  }
 
 
   /**
@@ -75,6 +84,74 @@ where aut.PERS_ID = :id', $params)->fetch();
     loadView('authors/show', [
       'author' => $author
     ]);
+  }
+
+
+  /**
+   * Store data in database
+   *
+   * @return void
+   */
+  public function store()
+  {
+     $newAuthorData = array_intersect_key($_POST, array_flip($this->allowedFields));
+     $newAuthorData = array_map('sanitize',$newAuthorData);
+     $newAuthorData['OWNER_ID'] = Session::get('user')['id'];
+     $chkName = $newAuthorData['AUTH_NAME'];
+
+     $params = [ 'WRITER_NAME' => $chkName ];
+
+     $writer = $this->db->query('select aut.PERS_ID, aut.AUTH_NAME
+ from tbl_authors aut
+ where aut.AUTH_NAME = :WRITER_NAME', $params)->fetch();
+
+     if($writer) {
+         $errors['AUTH_NAME'] = 'This is a duplicated writer-s Name';
+     } else {
+         $errors = [];
+     }
+
+     foreach ($this->requiredFields as $field) {
+         if (empty($newAuthorData[$field]) || !Validation::string($newAuthorData[$field])) {
+           $errors[$field] = ucfirst($field) . ' is required';
+         }
+     }
+
+     if (empty($errors)) {
+        $fields = [];
+        $values = [];
+
+        foreach ($newAuthorData as $field => $value) {
+           $fields[] = $field;
+        }
+
+        $fields = implode(', ', $fields);
+
+        foreach ($newAuthorData as $field => $value) {
+             if ($value === '') {
+                 $newAuthorData[$field] = null;
+             }
+             $values[] = ":" . $field;
+        }
+
+        $values = implode(', ', $values);
+
+        $insertSql = "insert into `tbl_authors` ({$fields}) values ({$values})";
+
+        $this->db->query($insertSql, $newAuthorData);
+
+        Session::setFlashMessage('success_message','Successfully added a new Writer');
+
+        redirect('/byblios/authors');
+
+     } else {
+        inspectAndDie($errors);
+        loadView('authors/create',[
+             'authorData' => $newAuthorData,
+             'errors' => $errors
+        ]);
+
+     }
   }
 
 

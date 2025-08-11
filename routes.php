@@ -12,6 +12,7 @@ $router->get('/byblios/editor/edit/{id}', 'EditorController@edit',['auth']);
 $router->get('/byblios/authors/edit/{id}', 'AuthorController@edit',['auth']);
 $router->get('/byblios/book/create', 'BookController@create',['auth']);
 $router->get('/byblios/editor/create', 'EditorController@create',['auth']);
+$router->get('/byblios/authors/create','AuthorController@create',['auth']);
 //outer->get('/byblios/publishers', 'controllers/publishers/index.php');
 //outer->get('/byblios/publishers/create', 'controllers/publishers/create.php',['auth']);
 $router->get('/byblios/book/search','BookController@search');

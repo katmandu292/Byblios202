@@ -51,7 +51,7 @@
     <p><?= $author->AUTH_BIO ?></p>
   </div>
   <p class="my-5">
-    User from Session: <?= var_dump(Session::get('user')['id']) ?>, Editor Owner: <?= var_dump($author->OWNER_ID) ?>
+    User from Session: <?= var_dump(Session::get('user')['id']) ?>, Record Owner: <?= var_dump($author->OWNER_ID) ?>
   </p>
   <a href="mailto:<?= $author->OWNER_ID ?>" class="block w-full text-center px-5 py-2.5 shadow-sm rounded border text-base font-medium cursor-pointer text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
     Apply Now
