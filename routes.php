@@ -18,6 +18,7 @@ $router->get('/byblios/authors/create','AuthorController@create',['auth']);
 $router->get('/byblios/book/search','BookController@search');
 
 $router->get('/byblios/auth/login','UserController@login',['guest']);
+$router->get('/byblios/auth/reset','UserController@reset',['guest']);
 $router->get('/byblios/auth/register','UserController@create',['guest']);
 
 $router->put('/byblios/book/update/{id}', 'BookController@update',['auth']);
@@ -29,6 +30,7 @@ $router->post('/byblios/editor', 'EditorController@store',['auth']);
 $router->post('/byblios/authors', 'AuthorController@store',['auth']);
 $router->post('/byblios/auth/register','UserController@store',['auth']);
 $router->post('/byblios/auth/login','UserController@authenticate',['guest']);
+$router->post('/byblios/auth/reset','UserController@gen_token',['guest']);
 $router->post('/byblios/auth/logout','UserController@logout',['auth']);
 
 $router->delete('/byblios/book/show/{id}', 'BookController@destroy',['auth']);

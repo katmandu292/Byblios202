@@ -29,6 +29,17 @@ class UserController
 
 
   /**
+   * Show the reset password page
+   *
+   * @return void
+   */
+  public function reset()
+  {
+    loadView('users/reset');
+  }
+
+
+  /**
    * Show the register page
    * 
    * @return void
@@ -135,6 +146,58 @@ class UserController
     ]);
 
     redirect('/byblios/');
+  }
+
+
+  /**
+   * Generate a temporary teken
+   * for the user who lost his/her password
+   * 
+   * @return void
+   */
+  public function gen_token()
+  {
+    $email = $_POST['email'];
+    $timestmp = $_POST['CREATED_AT'];
+    $errors = [];
+
+//      Validation
+    if (!Validation::email($email)) {
+      $errors['email'] = 'Please enter a valid email';
+    }
+
+//      Check for email
+    $params = [ 'email' => $email ];
+
+    $user = $this->db->query('select usr.USER_ID
+from tbl_users usr where usr.USER_VALID_EMAIL = 1 and usr.USER_VALID = 1
+and usr.USER_EMAIL = :email', $params)->fetch();
+
+    if (!$user) {
+      $errors['user'] = 'Invalid user';
+      loadView('users/reset', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $expires = date("Y-m-d H:i:s", strtotime("+1 hour"));
+    $params = [ 'user' => $user->USER_ID,
+                'email' => $email,
+                'token'=> $token,
+                'expires' => date("Y-m-d H:i:s", strtotime("+1 hour")),
+                'created' => $timestmp
+    ];
+
+    $query = 'insert into tbl_psswdrst(USER_ID, USER_EMAIL, TMP_TOKEN, EXPIRES_AT, CREATED_AT) values (:user, :email, :token, :expires, :created)';
+
+    $this->db->query($query,$params);
+
+    loadView('users/done', [
+       'expires' => $expires
+    ]);
+    exit;
   }
 
 
