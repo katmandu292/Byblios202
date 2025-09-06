@@ -110,3 +110,19 @@ function redirect($url)
   exit;
 }
 
+/**
+ * Check whether a date
+ * is or is not expired
+ * 
+ * @param string $targetDate, string $referenceDate
+ * @return boolean
+ */
+function isDateExpired(string $targetDate, string $referenceDate = null): bool {
+//     If no reference date is provided, use the current date and time
+    $reference = $referenceDate ? new DateTime($referenceDate) : new DateTime();
+    $target = new DateTime($targetDate);
+
+//     Compare the two dates
+    return $target < $reference;
+}
+

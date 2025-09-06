@@ -19,11 +19,13 @@ $router->get('/byblios/book/search','BookController@search');
 
 $router->get('/byblios/auth/login','UserController@login',['guest']);
 $router->get('/byblios/auth/reset','UserController@reset',['guest']);
+$router->get('/byblios/auth/change/{id}','UserController@restore',['guest']);
 $router->get('/byblios/auth/register','UserController@create',['guest']);
 
 $router->put('/byblios/book/update/{id}', 'BookController@update',['auth']);
 $router->put('/byblios/editor/update/{id}', 'EditorController@update',['auth']);
 $router->put('/byblios/authors/update/{id}', 'AuthorController@update',['auth']);
+$router->put('/byblios/auth/change/{id}', 'UserController@chgpwd',['guest']);
 
 $router->post('/byblios/books', 'BookController@store',['auth']);
 $router->post('/byblios/editor', 'EditorController@store',['auth']);

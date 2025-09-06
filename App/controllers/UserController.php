@@ -10,10 +10,13 @@ class UserController
 {
   protected $db;
 
+  protected $allowedFields;
+
   public function __construct()
   {
     $config = require basePath('config/_db.php');
     $this->db = new Database($config);
+    $this->allowedFields = [ 'name', 'email', 'city', 'state', 'password', 'password_confirmation' ];
   }
 
 
@@ -47,6 +50,94 @@ class UserController
   public function create()
   {
     loadView('users/create');
+  }
+
+
+  /**
+  * Show the password Reset page
+  *
+  * @param array $params
+  * @return void
+  */
+  public function restore($params)
+  {
+    $id = $params['id'] ?? '';
+
+    loadView('users/newpw', [
+      'token' => $id
+    ]);
+  }
+
+
+  /**
+  * Change a User's password
+  * in the database
+  *
+  * @param array $params
+  * @return void
+  */
+  public function chgpwd($params)
+  {
+    $password = $_POST['password'];
+    $passwordConfirmation = $_POST['password_confirmation'];
+    $updatedAt = $_POST['UPDATED_AT'];
+    $errors = [];
+    $token = $params['id'] ?? '';
+    $tknParams = [ 'tokenId' => $token ];
+
+    $tknData = $this->db->query('select wdr.USER_ID, wdr.USER_EMAIL,
+ wdr.TMP_TOKEN, wdr.EXPIRES_AT, wdr.CREATED_AT
+ from tbl_psswdrst wdr
+ where wdr.TMP_TOKEN = :tokenId', $tknParams)->fetch();
+
+    if($tknData) {
+       $userId = $tknData->USER_ID;
+       $userMail = $tknData->USER_EMAIL;
+       $expiredAt = $tknData->EXPIRES_AT;
+
+       $oldUser = $this->db->query('select usr.USER_NAME,
+ usr.USER_EMAIL from tbl_users usr
+ where usr.USER_ID = ' . $userId . ' and usr.USER_VALID = 1')->fetch();
+
+       if ($oldUser) {
+         if(isDateExpired($expiredAt,$updatedAt)) {
+             $errors = [ 'toolate' => 'Token expired' ];
+         }
+       } else {
+         $errors = [ 'fakeuser' => 'User is no longer active' ];
+       }
+    } else {
+       $errors = [ 'notoken' => 'Invalid Token submitted'];
+    }
+
+    if(!$password === $passwordConfirmation) {
+       $errors = [ 'nopasswd' => 'Password check does not match'];
+    }
+
+    if (empty($errors)) {
+      $tknUpdates = [
+         'expires' => $updatedAt,
+         'userid' => $userId,
+         'token' => $token,
+         'usedby' => $oldUser->USER_NAME
+      ];
+
+      $usrUpdates = [
+         'userid' => $userId,
+         'newpass' => password_hash($password, PASSWORD_DEFAULT)
+      ];
+
+      $this->db->query('update tbl_psswdrst set EXPIRES_AT = :expires,
+ TMP_TOKEN = :usedby where USER_ID = :userid and TMP_TOKEN = :token', $tknUpdates);
+
+      $this->db->query('update tbl_users set USER_PWD = :newpass where USER_ID = :userid', $usrUpdates);
+      redirect('/byblios/');
+    } else {
+      loadView('users/reset', [
+         'errors' => $errors
+      ]);
+      exit;
+    }
   }
 
 

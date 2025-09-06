@@ -10,13 +10,17 @@
       'errors' => $errors ?? []
     ]) ?>
 <?php endif; ?>
-    <form method="POST" action="/byblios/auth/reset">
-        <input type="hidden" name="CREATED_AT" value="<?= date('Y-m-d H:i:s') ?>" />
+    <form method="POST" action="/byblios/auth/change/<?= $token ?>">
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="UPDATED_AT" value="<?= date('Y-m-d H:i:s') ?>" />
       <div class="mb-4">
-        <input type="text" name="email" placeholder="Email Address" class="w-full px-4 py-2 border rounded focus:outline-none" />
+        <input type="password" name="password" placeholder="Password" class="w-full px-4 py-2 border rounded focus:outline-none" />
+      </div>
+      <div class="mb-4">
+        <input type="password" name="password_confirmation" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded focus:outline-none" />
       </div>
       <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded focus:outline-none">
-        Send Reset Request
+        Reset Password
       </button>
 
       <p class="mt-4 text-gray-500">
@@ -28,3 +32,4 @@
 </div>
 
 <?= loadPartial('footer') ?>
+
